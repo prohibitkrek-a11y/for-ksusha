@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для Ксюшеньки 💗🐶</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    min-height: 100%;
+    overflow-x: hidden;
+    font-family: 'Segoe UI', 'Helvetica', sans-serif;
+    background: linear-gradient(135deg, #ffd1dc 0%, #ffb3c6 40%, #ff8fab 100%);
+    color: #5a1e2e;
+  }
+
+  #hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Полоска травы для корги внизу */
+  .grass {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 60px;
+    background: linear-gradient(to top, #a8e063, #d4f0a0);
+    opacity: 0.55;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 90px;
+    text-align: center;
+  }
+
+  .photo-wrap {
+    display: inline-block;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(180, 60, 100, 0.25);
+    animation: appear 1.2s ease both;
+  }
+
+  .photo-wrap img {
+    display: block;
+    width: 260px;
+    max-width: 80vw;
+    height: auto;
+    border-radius: 18px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 7vw, 46px);
+    margin: 30px 0 10px;
+    color: #a3204a;
+    letter-spacing: 1px;
+    animation: appear 1.6s ease both;
+  }
+
+  .subtitle {
+    font-size: clamp(16px, 4vw, 20px);
+    line-height: 1.6;
+    color: #6d2338;
+    margin-bottom: 25px;
+    min-height: 1.6em;
+    animation: appear 2s ease both;
+  }
+
+  .counter {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 18px 30px;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(180, 60, 100, 0.15);
+    animation: appear 2.4s ease both;
+  }
+
+  .counter .num {
+    font-size: clamp(32px, 8vw, 52px);
+    font-weight: 800;
+    color: #d6336c;
+    display: block;
+    line-height: 1;
+  }
+
+  .counter .label {
+    font-size: clamp(13px, 3.5vw, 16px);
+    color: #7a2a42;
+    margin-top: 8px;
+    display: block;
+  }
+
+  .heart-big {
+    font-size: 48px;
+    margin: 25px 0 5px;
+    animation: beat 1.2s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  /* ---------- Вопрос и кнопки ---------- */
+  .question-block {
+    margin-top: 30px;
+    padding: 30px 20px 40px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    box-shadow: 0 14px 40px rgba(180, 60, 100, 0.18);
+    position: relative;
+    min-height: 240px;
+  }
+
+  .question {
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: 700;
+    color: #a3204a;
+    margin-bottom: 30px;
+  }
+
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    position: relative;
+    min-height: 70px;
+  }
+
+  .btn {
+    font-family: inherit;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    padding: 16px 44px;
+    font-size: 18px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease,
+                font-size 0.25s ease, padding 0.25s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-yes {
+    color: #fff;
+    background: linear-gradient(135deg, #ff5c8a, #d6336c);
+    box-shadow: 0 12px 30px rgba(214, 51, 108, 0.45);
+    transform-origin: center;
+  }
+
+  .btn-yes:hover {
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 16px 36px rgba(214, 51, 108, 0.6);
+  }
+
+  .btn-no {
+    color: #a3204a;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 22px rgba(180, 60, 100, 0.25);
+    transition: top 0.35s ease, left 0.35s ease, transform 0.25s ease,
+                opacity 0.4s ease, font-size 0.25s ease, padding 0.25s ease;
+  }
+
+  .btn-no.floating {
+    position: fixed;
+    z-index: 999;
+  }
+
+  /* Корги-симпатяга рядом с кнопкой «Да» */
+  .corgi-buddy {
+    display: inline-block;
+    font-size: 34px;
+    margin-left: 6px;
+    animation: corgi-bounce 1.4s ease-in-out infinite;
+    transform-origin: center bottom;
+    vertical-align: middle;
+  }
+
+  @keyframes corgi-bounce {
+    0%, 100% { transform: translateY(0)   rotate(-4deg); }
+    50%      { transform: translateY(-8px) rotate(4deg); }
+  }
+
+  #answer {
+    margin-top: 25px;
+    font-size: clamp(18px, 4.5vw, 24px);
+    color: #a3204a;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    min-height: 1.5em;
+  }
+
+  #answer.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Бегающие корги по низу экрана */
+  .running-corgi {
+    position: fixed;
+    bottom: 6px;
+    font-size: 44px;
+    z-index: 3;
+    pointer-events: none;
+    animation: run-walk 0.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes run-walk {
+    0%   { transform: translateY(0)   rotate(-3deg); }
+    100% { transform: translateY(-6px) rotate(3deg); }
+  }
+
+  @keyframes appear {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.15); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="hearts"></canvas>
+<div class="grass"></div>
+
+<div class="container">
+
+  <div class="photo-wrap">
+    <img src="ksusha.jpg" alt="Ксюшенька">
+  </div>
+
+  <h1>Ксюшенька, я тебя люблю 💗🐶</h1>
+
+  <p class="subtitle" id="typing"></p>
+
+  <div class="counter">
+    <span class="num" id="daysNum">0</span>
+    <span class="label" id="daysLabel">дней</span>
+  </div>
+
+  <div><span class="heart-big">💖</span></div>
+
+  <div class="question-block">
+    <div class="question">Ксюшенька, ты будешь со мной навсегда?</div>
+
+    <div class="btn-row" id="btnRow">
+      <button class="btn btn-yes" id="btnYes">
+        Да 💗<span class="corgi-buddy">🐶</span>
+      </button>
+      <button class="btn btn-no"  id="btnNo">Нет</button>
+    </div>
+
+    <div id="answer"></div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   1. СЧЁТЧИК ДНЕЙ
+   ========================================================= */
+const startDate = new Date(2026, 3, 30); // 30 апреля 2026
+const today = new Date();
+const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+
+const numEl = document.getElementById('daysNum');
+const labEl = document.getElementById('daysLabel');
+
+if (diffDays >= 0) {
+  numEl.textContent = diffDays;
+  labEl.textContent = 'дней мы вместе 💗';
+} else {
+  numEl.textContent = Math.abs(diffDays);
+  labEl.textContent = 'дней до нашей встречи 💫';
+}
+
+/* =========================================================
+   2. ПЕЧАТАЮЩИЙСЯ ТЕКСТ
+   ========================================================= */
+const text = "Ксюшенька, ты — самое красивое, тёплое и родное, что случилось в моей жизни. Спасибо, что ты рядом. 🐶💗";
+const typingEl = document.getElementById('typing');
+let i = 0;
+function type() {
+  if (i < text.length) {
+    typingEl.textContent += text.charAt(i);
+    i++;
+    setTimeout(type, 45);
+  }
+}
+setTimeout(type, 1500);
+
+/* =========================================================
+   3. УБЕГАЮЩАЯ КНОПКА «НЕТ»
+   ========================================================= */
+const btnNo  = document.getElementById('btnNo');
+const btnYes = document.getElementById('btnYes');
+const answer = document.getElementById('answer');
+
+let noCount = 0;
+let yesScale = 1;
+const maxNoCount = 8;
+
+// Милые фразы для кнопки «Нет» (с корги-вайбом)
+const teasingPhrases = [
+  "Уверена? 🤔",
+  "Точно-точно? 🐶",
+  "Корги не одобряет",
+  "Подумай ещё 😊",
+  "Ну пожалуйста…",
+  "Не уходи 🥺",
+  "Кнопка убегает…",
+  "Гав! Не поймала 💗",
+  "Сдаёшься?"
+];
+
+function moveNoButton() {
+  const btnRect = btnNo.getBoundingClientRect();
+
+  if (!btnNo.classList.contains('floating')) {
+    btnNo.style.width  = btnRect.width + 'px';
+    btnNo.style.height = btnRect.height + 'px';
+    btnNo.classList.add('floating');
+    btnNo.style.top  = btnRect.top  + 'px';
+    btnNo.style.left = btnRect.left + 'px';
+  }
+
+  const pad = 20;
+  const maxX = window.innerWidth  - btnNo.offsetWidth  - pad;
+  const maxY = window.innerHeight - btnNo.offsetHeight - pad;
+  const newX = Math.max(pad, Math.random() * maxX);
+  const newY = Math.max(pad, Math.random() * maxY);
+
+  btnNo.style.left = newX + 'px';
+  btnNo.style.top  = newY + 'px';
+
+  noCount++;
+  const shrink = Math.max(0.35, 1 - noCount * 0.09);
+  btnNo.style.transform = 'scale(' + shrink + ')';
+  btnNo.style.fontSize  = (18 * shrink) + 'px';
+  btnNo.style.padding   = (16 * shrink) + 'px ' + (44 * shrink) + 'px';
+
+  yesScale = Math.min(2.2, 1 + noCount * 0.12);
+  btnYes.style.transform = 'scale(' + yesScale + ')';
+
+  if (noCount <= teasingPhrases.length) {
+    btnNo.textContent = teasingPhrases[noCount - 1];
+  }
+
+  if (noCount >= maxNoCount) {
+    btnNo.style.opacity = '0';
+    btnNo.style.pointerEvents = 'none';
+    setTimeout(() => btnNo.remove(), 500);
+  }
+}
+
+btnNo.addEventListener('mouseenter', moveNoButton);
+btnNo.addEventListener('touchstart', function (e) {
+  e.preventDefault();
+  moveNoButton();
+}, { passive: false });
+btnNo.addEventListener('click', function (e) {
+  e.preventDefault();
+  moveNoButton();
+});
+
+/* =========================================================
+   4. КНОПКА «ДА»
+   ========================================================= */
+btnYes.addEventListener('click', function () {
+  document.querySelector('.question-block').style.transition = 'opacity 0.6s ease';
+  document.querySelector('.question-block').style.opacity = '0';
+  setTimeout(() => {
+    document.querySelector('.question-block').style.display = 'none';
+  }, 600);
+
+  answer.textContent = "Я знал! 💗🐶  Ксюшенька, люблю тебя больше всего на свете!";
+  answer.classList.add('show');
+
+  // Салют из сердечек и корги
+  for (let k = 0; k < 60; k++) {
+    setTimeout(spawnBurstParticle, k * 25);
+  }
+
+  // Радостная стайка корги внизу
+  for (let k = 0; k < 6; k++) {
+    setTimeout(spawnRunningCorgi, k * 250);
+  }
+});
+
+/* =========================================================
+   5. ПАДАЮЩИЕ СЕРДЕЧКИ + ПАДАЮЩИЕ КОРГИ
+   ========================================================= */
+const canvas = document.getElementById('hearts');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const HEARTS = ['💗', '💖', '💕', '💞', '❤️', '🌸'];
+const CORGIS = ['🐶', '🐕', '🦴', '🐾'];   // корги и всё, что с ними связано
+const particles = [];
+
+// Обычное падающее сердечко
+function spawn() {
+  particles.push({
+    x: Math.random() * W,
+    y: -30,
+    size: 16 + Math.random() * 22,
+    speed: 0.6 + Math.random() * 1.4,
+    drift: (Math.random() - 0.5) * 0.8,
+    char: HEARTS[Math.floor(Math.random() * HEARTS.length)],
+    alpha: 0.5 + Math.random() * 0.5,
+    rot: (Math.random() - 0.5) * 0.04,
+    angle: 0
+  });
+}
+
+// Падающий корги (пореже)
+function spawnCorgi() {
+  particles.push({
+    x: Math.random() * W,
+    y: -50,
+    size: 26 + Math.random() * 20,
+    speed: 0.8 + Math.random() * 1.2,
+    drift: (Math.random() - 0.5) * 1.2,
+    char: CORGIS[Math.floor(Math.random() * CORGIS.length)],
+    alpha: 0.7 + Math.random() * 0.3,
+    rot: (Math.random() - 0.5) * 0.08,
+    angle: 0
+  });
+}
+
+// «Взрывной» фонтанчик в момент «Да»
+function spawnBurstParticle() {
+  const cx = W / 2;
+  const cy = H / 2;
+  const angle = Math.random() * Math.PI * 2;
+  const speed = 3 + Math.random() * 6;
+  const isCorgi = Math.random() < 0.4;   // 40% корги, 60% сердечки
+  particles.push({
+    x: cx,
+    y: cy,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    size: 18 + Math.random() * 26,
+    speed: 0,
+    drift: 0,
+    char: isCorgi
+      ? CORGIS[Math.floor(Math.random() * CORGIS.length)]
+      : HEARTS[Math.floor(Math.random() * HEARTS.length)],
+    alpha: 1,
+    rot: (Math.random() - 0.5) * 0.15,
+    angle: 0,
+    burst: true
+  });
+}
+
+function loop() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Иногда спавним сверху
+  if (Math.random() < 0.35) spawn();
+  if (Math.random() < 0.04) spawnCorgi();   // ~1 корги в 2-3 секунды
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+
+    if (p.burst) {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.08;
+      p.vx *= 0.99;
+      p.alpha -= 0.008;
+    } else {
+      p.y += p.speed;
+      p.x += p.drift;
+    }
+    p.angle += p.rot;
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, p.alpha);
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.font = p.size + 'px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(p.char, 0, 0);
+    ctx.restore();
+
+    if (p.y > H + 60 || p.alpha <= 0) particles.splice(i, 1);
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* =========================================================
+   6. БЕГАЮЩИЕ КОРГИ ПО НИЗУ ЭКРАНА
+   ========================================================= */
+function spawnRunningCorgi() {
+  const el = document.createElement('div');
+  el.className = 'running-corgi';
+  el.textContent = CORGIS[Math.floor(Math.random() * CORGIS.length)];
+
+  const fromLeft = Math.random() < 0.5;
+  const speed = 3 + Math.random() * 4;   // секунды на проход
+  const size = 34 + Math.random() * 24;
+  el.style.fontSize = size + 'px';
+  el.style.bottom = (4 + Math.random() * 20) + 'px';
+
+  if (fromLeft) {
+    el.style.left = '-80px';
+    el.style.transform = 'scaleX(1)';
+  } else {
+    el.style.right = '-80px';
+    el.style.transform = 'scaleX(-1)';
+  }
+
+  document.body.appendChild(el);
+
+  const startTime = performance.now();
+  const totalDistance = window.innerWidth + 160;
+
+  function step(now) {
+    const t = (now - startTime) / 1000 / speed;   // 0 → 1
+    if (t >= 1) {
+      el.remove();
+      return;
+    }
+    const x = t * totalDistance;
+    if (fromLeft) {
+      el.style.left = (x - 80) + 'px';
+    } else {
+      el.style.right = (x - 80) + 'px';
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Запускаем корги периодически (каждые ~6 секунд)
+setInterval(spawnRunningCorgi, 6000);
+// И сразу пару для настроения
+setTimeout(spawnRunningCorgi, 1500);
+setTimeout(spawnRunningCorgi, 3000);
+</script>
+
+</body>
+</html>
